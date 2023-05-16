@@ -1,0 +1,4 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Packages/com.redwyre.devtools/Editor/DevTools.uss?fileID=7433441132597879392&amp;guid=4e903b81796eb4347aa8fb63ac9ce6c9&amp;type=3#DevTools" />
+    <ui:Button text="Nuke library and restart Unity" display-tooltip-when-elided="true" name="NukeLibrary" />
+</ui:UXML>
