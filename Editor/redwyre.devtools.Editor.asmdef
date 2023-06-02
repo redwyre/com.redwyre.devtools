@@ -1,8 +1,14 @@
 {
-    "name": "Redwyre.DevTools",
+    "name": "Redwyre.DevTools.Editor",
     "rootNamespace": "",
-    "references": [],
-    "includePlatforms": [],
+    "references": [
+        "GUID:478a2357cc57436488a56e564b08d223",
+        "GUID:b75d3cd3037d383a8d1e2f9a26d73d8a",
+        "GUID:2665a8d13d1b3f18800f46e256720795"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
