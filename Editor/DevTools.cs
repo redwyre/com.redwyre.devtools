@@ -12,17 +12,10 @@ using System.Collections;
 using System;
 using Unity.Burst;
 
-public class DevTools : EditorWindow
+public partial class DevTools : EditorWindow
 {
     [SerializeField]
     private VisualTreeAsset m_VisualTreeAsset = default;
-    private Button buttonNukeLibrary;
-    private Button buttonCalculateBurstCacheSize;
-    private Button buttonClearBurstCache;
-    private Button buttonCloseError;
-    private Label labelBurstCacheSize;
-    private VisualElement elementErrorMessageContainer;
-    private Label labelErrorMessage;
 
     EditorCoroutine burstCacheSizeCalculator;
 
@@ -36,35 +29,52 @@ public class DevTools : EditorWindow
         wnd.titleContent = new GUIContent("DevTools");
     }
 
-    public void CreateGUI()
+    partial void OnCreateGUI()
     {
-        VisualElement labelFromUXML = m_VisualTreeAsset.Instantiate();
-        rootVisualElement.Add(labelFromUXML);
-
-        var children = rootVisualElement.Children().ToList();
-
-        buttonNukeLibrary = rootVisualElement.Q<Button>("NukeLibrary");
-        buttonCalculateBurstCacheSize = rootVisualElement.Q<Button>("CalculateBurstCacheSize");
-        buttonClearBurstCache = rootVisualElement.Q<Button>("ClearBurstCache");
-        buttonCloseError = rootVisualElement.Q<Button>("CloseError");
-        labelBurstCacheSize = rootVisualElement.Q<Label>("labelBurstCacheSize");
-        elementErrorMessageContainer = rootVisualElement.Q<VisualElement>("ErrorMessageContainer");
-        labelErrorMessage = rootVisualElement.Q<Label>("ErrorMessage");
-
-        buttonNukeLibrary.clicked += ButtonNukeLibrary_clicked;
-        buttonCalculateBurstCacheSize.clicked += ButtonCalculateBurstCacheSize_clicked;
-        buttonClearBurstCache.clicked += ButtonClearBurstCache_clicked;
-        buttonCloseError.clicked += ButtonCloseError_clicked;
+        NukeScripts.clicked += NukeScripts_clicked;
+        NukeLibrary.clicked += NukeLibrary_clicked;
+        RestartBurst.clicked += RestartBurst_clicked;
+        CalculateBurstCacheSize.clicked += CalculateBurstCacheSize_clicked;
+        ClearBurstCache.clicked += ClearBurstCache_clicked;
+        CloseError.clicked += CloseError_clicked;
     }
 
-    private void ButtonCloseError_clicked()
+    private void RestartBurst_clicked()
+    {
+        var wasEnabled = BurstCompiler.Options.EnableBurstCompilation;
+
+        BurstCompiler.Options.EnableBurstCompilation = false;
+        BurstCompiler.Options.EnableBurstCompilation = wasEnabled;
+    }
+
+    private void NukeScripts_clicked()
+    {
+        var proceed = EditorUtility.DisplayDialog("Nuke Scripts", "This will shut down Unity, delete the script related contents of the library folder, and then restart Unity. It will take a while to reimport all the assets. Do you wish to proceed?", "Yes", "No");
+
+        if (!proceed) { return; }
+
+        RunScript("Packages/com.redwyre.devtools/Scripts/NukeScripts.ps1");
+        EditorApplication.Exit(0);
+    }
+
+    private void NukeLibrary_clicked()
+    {
+        var proceed = EditorUtility.DisplayDialog("Nuke Library", "This will shut down Unity, delete the contents of the library folder, and then restart Unity. It will take a while to reimport all the assets. Do you wish to proceed?", "Yes", "No");
+
+        if (!proceed) { return; }
+
+        RunScript("Packages/com.redwyre.devtools/Scripts/NukeLibrary.ps1");
+        EditorApplication.Exit(0);
+    }
+
+    private void CloseError_clicked()
     {
         SetErrorMessage(null);
     }
 
-    private void ButtonClearBurstCache_clicked()
+    private void ClearBurstCache_clicked()
     {
-        buttonClearBurstCache.SetEnabled(false);
+        ClearBurstCache.SetEnabled(false);
 
         var temp = BurstCachePath + ".deleteme";
 
@@ -87,20 +97,20 @@ public class DevTools : EditorWindow
         }
 
         BurstCompiler.Options.EnableBurstCompilation = wasEnabled;
-        buttonClearBurstCache.SetEnabled(true);
+        ClearBurstCache.SetEnabled(true);
     }
 
-    private void ButtonCalculateBurstCacheSize_clicked()
+    private void CalculateBurstCacheSize_clicked()
     {
         if (burstCacheSizeCalculator == null)
         {
-            burstCacheSizeCalculator = EditorCoroutineUtility.StartCoroutine(CalculateBurstCacheSize(), this);
+            burstCacheSizeCalculator = EditorCoroutineUtility.StartCoroutine(CalculateBurstCacheSizeFunc(), this);
         }
     }
 
-    private IEnumerator CalculateBurstCacheSize()
+    private IEnumerator CalculateBurstCacheSizeFunc()
     {
-        buttonCalculateBurstCacheSize.SetEnabled(false);
+        CalculateBurstCacheSize.SetEnabled(false);
 
         var fileNames = Directory.EnumerateFiles(BurstCachePath, "*", SearchOption.AllDirectories);
 
@@ -122,13 +132,7 @@ public class DevTools : EditorWindow
 
         labelBurstCacheSize.text = PrettyBytes(totalSize);
         burstCacheSizeCalculator = null;
-        buttonCalculateBurstCacheSize.SetEnabled(true);
-    }
-
-    private void ButtonNukeLibrary_clicked()
-    {
-        RunScript("Packages/com.redwyre.devtools/Scripts/NukeLibrary.ps1");
-        EditorApplication.Exit(0);
+        CalculateBurstCacheSize.SetEnabled(true);
     }
 
     private void RunScript(string scriptPath)
@@ -165,13 +169,13 @@ public class DevTools : EditorWindow
     {
         if (!string.IsNullOrEmpty(message))
         {
-            elementErrorMessageContainer.style.display = DisplayStyle.Flex;
-            labelErrorMessage.text = message;
+            ErrorMessageContainer.style.display = DisplayStyle.Flex;
+            ErrorMessage.text = message;
         }
         else
         {
-            labelErrorMessage.text = "";
-            elementErrorMessageContainer.style.display = DisplayStyle.None;
+            ErrorMessage.text = "";
+            ErrorMessageContainer.style.display = DisplayStyle.None;
         }
     }
 }
