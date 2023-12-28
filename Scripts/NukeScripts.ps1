@@ -14,36 +14,41 @@ while ((Get-Process -Id $UnityPid -ErrorAction SilentlyContinue) -ne $null) {
 
 Write-Host ""
 
-Write-Host "Removing Unity library and other generated folders and files"
+Write-Host "Removing script related files from the Unity library"
 
 cd $ProjectDir
 
-if (Test-Path "obj") {
-    #Remove-Item -Path "obj" -Force
+function RemoveFolder {
+    param($Subfolder)
+
+    if (Test-Path $Subfolder) {
+        Write-Host "Removing folder '$Subfolder' and contents"
+        Remove-Item -Path $Subfolder -Force -Recurse
+    }
 }
 
-if (Test-Path "Temp") {
-    #Remove-Item -Path "Temp" -Force
-}
+RemoveFolder "obj"
 
-if (Test-Path "Library\ScriptAssemblies") {
-    #Remove-Item -Path "Library" -Force
-}
+RemoveFolder "Temp"
 
-if (Test-Path "Library\Bee") {
-    #Remove-Item -Path "Library" -Force
-}
+RemoveFolder "Library\ScriptAssemblies"
 
-#Remove-Item "*.csproj"
-#Remove-Item "*.sln"
+RemoveFolder "Library\Bee"
 
-Read-Host
+RemoveFolder "Library\BurstCache"
+
+
+
+Write-Host "Removing all project and solution files"
+Remove-Item "*.csproj"
+Remove-Item "*.sln"
+
+Write-Host "Complete."
+Write-Host ""
+Write-Host "Starting Unity"
 
 #Start-Process "$hubPath\Unity Hub.exe" -ArgumentList "-- --headless help" -Wait
 
-Write-Host "Starting Unity"
-
 Start-Process $UnityPath -ArgumentList "-projectpath `"$ProjectDir`""
 
-
-Read-Host
+Start-Sleep -Seconds 10

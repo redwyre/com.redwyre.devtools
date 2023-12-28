@@ -4,6 +4,10 @@
         <ui:Button text="X" display-tooltip-when-elided="true" name="CloseError" style="position: relative; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; border-left-width: 0; border-right-width: 0; border-top-width: 0; border-bottom-width: 0; width: 20px; height: 20px;" />
         <ui:Label tabindex="-1" text="Error message goes here" display-tooltip-when-elided="true" name="ErrorMessage" style="flex-grow: 1; height: auto; white-space: normal; flex-shrink: 1;" />
     </ui:VisualElement>
+    <ui:GroupBox text="Tools">
+        <ui:Button text="Force Recompile" parse-escape-sequences="true" display-tooltip-when-elided="true" name="ForceRecompile" />
+        <ui:Button text="Reload Domain" parse-escape-sequences="true" display-tooltip-when-elided="true" name="ReloadDomain" />
+    </ui:GroupBox>
     <ui:GroupBox text="Library" style="flex-grow: 1;">
         <ui:Button text="Nuke compiled scripts and restart Unity" display-tooltip-when-elided="true" name="NukeScripts" />
         <ui:Button text="Nuke library and restart Unity" display-tooltip-when-elided="true" name="NukeLibrary" />

@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEditor.PackageManager.Requests;
 using UnityEditor.PackageManager;
+using UnityEditor.Compilation;
 using System.Linq;
 using System.Diagnostics;
 using System.Text;
@@ -14,9 +15,6 @@ using Unity.Burst;
 
 public partial class DevTools : EditorWindow
 {
-    [SerializeField]
-    private VisualTreeAsset m_VisualTreeAsset = default;
-
     EditorCoroutine burstCacheSizeCalculator;
 
     public string ProjectPath => Path.GetDirectoryName(Application.dataPath);
@@ -31,12 +29,24 @@ public partial class DevTools : EditorWindow
 
     partial void OnCreateGUI()
     {
+        ForceRecompile.clicked += ForceRecompile_clicked;
+        ReloadDomain.clicked += ReloadDomain_clicked;
         NukeScripts.clicked += NukeScripts_clicked;
         NukeLibrary.clicked += NukeLibrary_clicked;
         RestartBurst.clicked += RestartBurst_clicked;
         CalculateBurstCacheSize.clicked += CalculateBurstCacheSize_clicked;
         ClearBurstCache.clicked += ClearBurstCache_clicked;
         CloseError.clicked += CloseError_clicked;
+    }
+
+    private void ForceRecompile_clicked()
+    {
+        CompilationPipeline.RequestScriptCompilation(RequestScriptCompilationOptions.CleanBuildCache);
+    }
+
+    private void ReloadDomain_clicked()
+    {
+        EditorUtility.RequestScriptReload();
     }
 
     private void RestartBurst_clicked()
