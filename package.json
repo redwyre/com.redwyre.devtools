@@ -1,7 +1,7 @@
 {
   "name": "com.redwyre.devtools",
   "version": "1.0.0",
-  "displayName": "Dev Tools",
+  "displayName": "redwyre Dev Tools",
   "description": "A window with some tools for developers",
   "unity": "2022.2",
   "documentationUrl": "https://example.com/",
@@ -15,7 +15,7 @@
   ],
   "author": {
     "name": "Simon Stevenson",
-    "email": "redwyre@redwyre.com",
-    "url": "https://www.redwyre.com"
+    "url": "https://www.redwyre.com",
+    "email": "redwyre@redwyre.com"
   }
 }

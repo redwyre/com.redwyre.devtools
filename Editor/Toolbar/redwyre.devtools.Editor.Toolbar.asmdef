@@ -1,0 +1,18 @@
+{
+    "name": "redwyre.devtools.Editor.Toolbar",
+    "rootNamespace": "",
+    "references": [
+        "GUID:486242810209fb546a3a3dadbf470238"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "UNITY_6000_3_OR_NEWER"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
