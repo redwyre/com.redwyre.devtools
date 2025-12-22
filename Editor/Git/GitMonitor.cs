@@ -24,13 +24,13 @@ public class GitMonitor
 
     public GitMonitor()
     {
-        var gitPath = Path.Combine(Application.dataPath, "..", ".git");
+        var gitPath = Path.GetFullPath(Path.Combine(Application.dataPath, "..", ".git"));
         watcher = new FileSystemWatcher(gitPath, IndexLock);
         watcher.IncludeSubdirectories = false;
         watcher.Created += OnChanged;
         watcher.Deleted += OnChanged;
         watcher.EnableRaisingEvents = true;
-        Debug.Log("GitMonitor watching path: " + gitPath);
+        Debug.Log($"GitMonitor watching path: {gitPath}");
 
         EditorApplication.update += OnEditorUpdate;
     }
