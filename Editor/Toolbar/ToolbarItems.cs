@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Unity.CodeEditor;
 using Unity.Collections;
 using UnityEditor;
 using UnityEditor.Compilation;
@@ -8,7 +9,18 @@ using Debug = UnityEngine.Debug;
 
 public class ToolbarItems
 {
-    [MainToolbarElement("DevTools/Project Settings")]//[ToolbarItem(Icon = "Settings", ToolTip = "Project Settings")]
+    [MainToolbarElement("DevTools/Open C# Project")]
+    public static MainToolbarElement OpenCSProject()
+    {
+        var editor = CodeEditor.Editor.CurrentInstallation.Name ?? "";
+
+        var icon = EditorGUIUtility.IconContent("d_boo Script Icon").image as Texture2D;
+        var tooltip = string.IsNullOrEmpty(editor) ? "Open C# Project" : $"Open C# Project with {editor}";
+        var content = new MainToolbarContent(icon, tooltip);
+        return new MainToolbarButton(content, static () => { EditorApplication.ExecuteMenuItem("Assets/Open C# Project"); });
+    }
+
+    [MainToolbarElement("DevTools/Project Settings")]
     public static MainToolbarElement OpenProjectSettings()
     {
         var icon = EditorGUIUtility.IconContent("Settings").image as Texture2D;
@@ -16,7 +28,7 @@ public class ToolbarItems
         return new MainToolbarButton(content, static () => { EditorApplication.ExecuteMenuItem("Edit/Project Settings..."); });
     }
 
-    [MainToolbarElement("DevTools/Project Folder")]//[ToolbarItem(Icon = "Folder Icon", ToolTip = "Open Folder")]
+    [MainToolbarElement("DevTools/Project Folder")]
     public static MainToolbarElement OpenFolder()
     {
         var icon = EditorGUIUtility.IconContent("Folder Icon").image as Texture2D;
@@ -24,7 +36,7 @@ public class ToolbarItems
         return new MainToolbarButton(content, static () => { EditorUtility.RevealInFinder(Application.dataPath); });
     }
 
-    [MainToolbarElement("DevTools/Open Terminal")]//[ToolbarItem(Icon = "d_winbtn_win_max", ToolTip = "Open Terminal")]
+    [MainToolbarElement("DevTools/Open Terminal")]
     public static MainToolbarElement OpenTerminal()
     {
         var icon = EditorGUIUtility.IconContent("d_winbtn_win_max").image as Texture2D;
@@ -32,7 +44,7 @@ public class ToolbarItems
         return new MainToolbarButton(content, static () => { Process.Start("wt"); });
     }
 
-    [MainToolbarElement("DevTools/Script Recompile")]//[ToolbarItem(Icon = "cs Script Icon", ToolTip = "Script Recompile")]
+    [MainToolbarElement("DevTools/Script Recompile")]
     public static MainToolbarElement ScriptRecompile()
     {
         var icon = EditorGUIUtility.IconContent("cs Script Icon").image as Texture2D;
@@ -48,7 +60,7 @@ public class ToolbarItems
         return new MainToolbarButton(content, static () => { EditorUtility.RequestScriptReload(); });
     }
 
-    [MainToolbarElement("DevTools/Clear PlayerPrefs")]//[ToolbarItem(Icon = "Cancel", ToolTip = "Clear PlayerPrefs")]
+    [MainToolbarElement("DevTools/Clear PlayerPrefs")]
     public static MainToolbarElement ClearPlayerPrefs()
     {
         var icon = EditorGUIUtility.IconContent("Cancel").image as Texture2D;
