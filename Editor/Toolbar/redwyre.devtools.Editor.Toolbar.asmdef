@@ -2,7 +2,8 @@
     "name": "redwyre.devtools.Editor.Toolbar",
     "rootNamespace": "",
     "references": [
-        "GUID:486242810209fb546a3a3dadbf470238"
+        "GUID:486242810209fb546a3a3dadbf470238",
+        "GUID:c073c66fddbc0dd468ddd53d98870b80"
     ],
     "includePlatforms": [
         "Editor"
