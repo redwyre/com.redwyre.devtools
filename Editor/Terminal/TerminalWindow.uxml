@@ -1,0 +1,12 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Packages/com.redwyre.devtools/Editor/Terminal/TerminalWindow.uss?fileID=7433441132597879392&amp;guid=3aa3f2100c0c9034da59f323c7bd04d0&amp;type=3#TerminalWindow"/>
+    <uie:Toolbar>
+        <uie:ToolbarButton text="Clear" name="Clear"/>
+        <uie:ToolbarButton text="Help" name="Help"/>
+    </uie:Toolbar>
+    <ui:TextField name="Output" multiline="true" vertical-scroller-visibility="AlwaysVisible" select-all-on-focus="false" select-all-on-mouse-up="false" class="terminal-font" style="flex-grow: 1; flex-shrink: 1;"/>
+    <ui:VisualElement style="flex-direction: row; flex-grow: 0; flex-shrink: 0;">
+        <ui:TextField name="Input" class="terminal-font" style="flex-grow: 1;"/>
+        <ui:Button text="Enter" name="Submit"/>
+    </ui:VisualElement>
+</ui:UXML>

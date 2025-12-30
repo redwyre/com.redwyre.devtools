@@ -1,0 +1,6 @@
+:root {
+}
+
+.terminal-font {
+    -unity-font-definition: url("project://database/Library/unity%20editor%20resources?fileID=-4672138242649953077&guid=0000000000000000d000000000000000&type=0#RobotoMono-Regular SDF");
+}
