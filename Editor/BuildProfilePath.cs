@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class BuildProfilePath : ScriptableObject
 {
-    public string path;
+    public string? path;
 
 #if UNITY_EDITOR
     // Editor-only function that Unity calls when the script is loaded or a value changes in the Inspector.

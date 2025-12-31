@@ -19,13 +19,13 @@ namespace redwyre.DevTools.Editor.UnsavedChanges
         public const string RowUxmlPath = "Packages/com.redwyre.devtools/Editor/UnsavedChanges/UnsavedChangesRow.uxml";
 
         private UnsavedChangesViewModel viewModel = new UnsavedChangesViewModel();
-        private VisualTreeAsset rowTemplate;
+        private VisualTreeAsset? rowTemplate;
 
-        private Button refreshButton;
-        private Button saveAllButton;
-        private Button revertAllButton;
-        private Label statusLabel;
-        private Label emptyStateLabel;
+        private Button? refreshButton;
+        private Button? saveAllButton;
+        private Button? revertAllButton;
+        private Label? statusLabel;
+        private Label? emptyStateLabel;
 
         private readonly Dictionary<AssetKind, SectionElements> sections = new Dictionary<AssetKind, SectionElements>();
 
@@ -393,12 +393,18 @@ namespace redwyre.DevTools.Editor.UnsavedChanges
 
         private void UpdateStatusBar()
         {
+            if (statusLabel != null)
+            {
             statusLabel.text = $"Scenes: {viewModel.ScenesCount} | Prefabs: {viewModel.PrefabsCount} | Settings: {viewModel.SettingsCount} | Other: {viewModel.OtherCount} | Total: {viewModel.TotalCount}";
+        }
         }
 
         private void UpdateEmptyState()
         {
+            if (emptyStateLabel != null)
+            {
             emptyStateLabel.style.display = viewModel.TotalCount == 0 ? DisplayStyle.Flex : DisplayStyle.None;
+        }
         }
 
         private void HandleSaveAll()

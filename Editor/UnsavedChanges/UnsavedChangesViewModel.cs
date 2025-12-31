@@ -19,12 +19,12 @@ namespace redwyre.DevTools.Editor.UnsavedChanges
         private int entriesVersion;
         private bool isBusy;
 
-        public event Action RefreshRequested;
-        public event Action SaveAllRequested;
-        public event Action RevertAllRequested;
-        public event Action<DirtyEntry> SaveRequested;
-        public event Action<DirtyEntry> RevertRequested;
-        public event Action<DirtyEntry> PingRequested;
+        public event Action? RefreshRequested;
+        public event Action? SaveAllRequested;
+        public event Action? RevertAllRequested;
+        public event Action<DirtyEntry>? SaveRequested;
+        public event Action<DirtyEntry>? RevertRequested;
+        public event Action<DirtyEntry>? PingRequested;
 
         public IReadOnlyList<DirtyEntry> AllEntries => allEntries;
         public IReadOnlyList<DirtyEntry> Scenes => entriesByKind[AssetKind.Scene];

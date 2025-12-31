@@ -13,15 +13,15 @@ public abstract class ProcessTerminalHostBase : IHost
     readonly string workingDirectory;
     bool publishScheduled;
 
+    public event Action<string>? OutputChanged;
+
+    public string WorkingDirectory => workingDirectory;
+    public abstract string ShellDisplayName { get; }
+
     protected ProcessTerminalHostBase()
     {
         workingDirectory = ResolveWorkingDirectory();
     }
-
-    public event Action<string> OutputChanged;
-
-    public string WorkingDirectory => workingDirectory;
-    public abstract string ShellDisplayName { get; }
 
     public void Write(string text)
     {

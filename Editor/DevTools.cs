@@ -15,7 +15,7 @@ using Unity.Burst;
 
 public partial class DevTools : EditorWindow
 {
-    EditorCoroutine burstCacheSizeCalculator;
+    EditorCoroutine? burstCacheSizeCalculator;
 
     public string ProjectPath => Path.GetDirectoryName(Application.dataPath);
     public string BurstCachePath => Path.Combine(ProjectPath, "Library", "BurstCache");
@@ -175,7 +175,7 @@ public partial class DevTools : EditorWindow
         return $"{number:G03}{postfix}";
     }
 
-    public void SetErrorMessage(string message)
+    public void SetErrorMessage(string? message)
     {
         if (!string.IsNullOrEmpty(message))
         {

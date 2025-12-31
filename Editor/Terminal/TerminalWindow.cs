@@ -11,14 +11,14 @@ public class TerminalWindow : EditorWindow
     public const string Icon = "winbtn_win_max";
     public const string WindowUxml = "Packages/com.redwyre.devtools/Editor/Terminal/TerminalWindow.uxml";
 
-    private IHost host;
+    private IHost? host;
 
     [MenuItem("Window/Tools/Terminal", priority = 10000)]
     public static void ShowTerminalWindow()
     {
-        TerminalWindow wnd = GetWindow<TerminalWindow>();
-        var iconContent = EditorGUIUtility.IconContent(Icon);
-        wnd.titleContent = new GUIContent(Title);// new GUIContent(Title, iconContent.image);
+        TerminalWindow wnd = GetWindow<TerminalWindow>(Title);
+        //var iconContent = EditorGUIUtility.IconContent(Icon);
+        //wnd.titleContent = new GUIContent(Title, iconContent.image);
     }
 
     public void CreateGUI()
@@ -81,7 +81,7 @@ public class TerminalWindow : EditorWindow
     private void SubmitCommand(TextField inputField)
     {
         var cmd = inputField.value?.Trim();
-        if (!string.IsNullOrEmpty(cmd))
+        if (!Nullable.IsNullOrEmpty(cmd))
         {
             host?.ExecuteCommand(cmd);
             history.Add(cmd);
