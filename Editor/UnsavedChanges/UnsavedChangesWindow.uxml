@@ -1,0 +1,41 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Packages/com.redwyre.devtools/Editor/UnsavedChanges/UnsavedChangesWindow.uss?fileID=7433441132597879392&amp;guid=6901b35446cd9484dab62e4ac7eedda3&amp;type=3#UnsavedChangesWindow"/>
+    <ui:VisualElement style="flex-grow: 1;">
+        <uie:Toolbar>
+            <uie:ToolbarButton text="Refresh" name="RefreshButton"/>
+            <uie:ToolbarButton text="Save All" name="SaveAllButton"/>
+            <uie:ToolbarButton text="Revert All" name="RevertAllButton"/>
+            <uie:ToolbarSpacer style="flex-grow: 1;"/>
+            <ui:Label name="StatusLabel" text="Scenes Prefabs Settings Other Total" class="uc-status" style="-unity-text-align: middle-left; margin-bottom: 2px; margin-top: 2px; margin-right: 2px; margin-left: 2px; color: rgb(120, 120, 120);"/>
+        </uie:Toolbar>
+        <ui:VisualElement class="uc-root">
+            <ui:Label name="EmptyStateLabel" text="No dirty assets found." class="uc-empty"/>
+            <ui:ScrollView name="SectionsScroll" class="uc-scroll">
+                <ui:VisualElement name="ScenesSection" class="uc-section">
+                    <ui:VisualElement class="uc-section-header">
+                        <ui:Label name="ScenesHeader" text="Scenes"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="ScenesList" class="uc-section-list"/>
+                </ui:VisualElement>
+                <ui:VisualElement name="PrefabsSection" class="uc-section">
+                    <ui:VisualElement class="uc-section-header">
+                        <ui:Label name="PrefabsHeader" text="Prefabs"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="PrefabsList" class="uc-section-list"/>
+                </ui:VisualElement>
+                <ui:VisualElement name="SettingsSection" class="uc-section">
+                    <ui:VisualElement class="uc-section-header">
+                        <ui:Label name="SettingsHeader" text="Settings"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="SettingsList" class="uc-section-list"/>
+                </ui:VisualElement>
+                <ui:VisualElement name="OtherSection" class="uc-section">
+                    <ui:VisualElement class="uc-section-header">
+                        <ui:Label name="OtherHeader" text="Other Assets"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="OtherList" class="uc-section-list"/>
+                </ui:VisualElement>
+            </ui:ScrollView>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

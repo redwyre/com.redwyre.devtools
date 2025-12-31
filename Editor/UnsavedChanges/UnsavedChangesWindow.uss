@@ -1,0 +1,105 @@
+.uc-root {
+    padding: 8px;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.uc-status {
+    unity-font-style: bold;
+    margin-left: 2px;
+    margin-bottom: 6px;
+}
+
+.uc-scroll {
+    flex-grow: 1;
+    margin-bottom: 6px;
+}
+
+.uc-section {
+    flex-direction: column;
+    margin-top: 4px;
+    padding: 4px;
+    border-top: 1px solid rgb(58, 58, 58);
+}
+
+.uc-section-header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    unity-font-style: bold;
+}
+
+.uc-section-list {
+    flex-direction: column;
+    margin-top: 4px;
+    margin-bottom: 4px;
+}
+
+.uc-row {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 6px;
+    background-color: rgba(255, 255, 255, 0.02);
+    border-radius: 3px;
+}
+
+.uc-row :hover :enabled {
+    background-color: rgba(255, 255, 255, 0.12);
+}
+
+.uc-row-info {
+    flex-direction: row;
+    align-items: center;
+    flex-grow: 1;
+    margin-right: 6px;
+}
+
+.uc-row-labels {
+    flex-direction: column;
+}
+
+.uc-icon {
+    margin-right: 6px;
+    min-width: 16px;
+    min-height: 16px;
+    width: 32px;
+    height: 32px;
+    max-width: 32px;
+    max-height: 32px;
+}
+
+.uc-name {
+    unity-font-style: bold;
+}
+
+.uc-path {
+    font-size: 11px;
+}
+
+.uc-badge {
+    padding: 2px 6px;
+    background-color: rgb(60, 90, 110);
+    color: white;
+    border-radius: 4px;
+    font-size: 10px;
+    margin-left: 0;
+    margin-right: 20px;
+}
+
+.uc-row-actions {
+    flex-direction: row;
+}
+
+.uc-empty {
+    margin-top: 8px;
+    font-size: 12px;
+    -unity-text-align: upper-center;
+}
+
+.uc-action-button {
+    margin-right: 0;
+    margin-left: 0;
+}
+
+
