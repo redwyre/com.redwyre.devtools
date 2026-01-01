@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Unity.CodeEditor;
+using UnityEditor;
 using UnityEditor.Compilation;
+using UnityEditorInternal;
 using UnityEngine;
 
 namespace redwyre.DevTools
@@ -63,9 +65,55 @@ namespace redwyre.DevTools
             var codeEditor = CodeEditor.Editor.CurrentCodeEditor;
 
             if (codeEditor == null)
+            {
+                Debug.LogWarning("No code editor is currently set, cannot build projects and solution.");
                 return;
+            }
 
             codeEditor.SyncAll();
+        }
+
+        public static string SerializeUnityObjectToAssetString(UnityEngine.Object unityObject)
+        {
+            string tempPath = string.Empty;
+
+            try
+            {
+                tempPath = Path.GetTempFileName();
+                if (SerializeUnityObjectToFile(unityObject, tempPath))
+                {
+                    return File.ReadAllText(tempPath);
+                }
+            }
+            finally
+            {
+                if (File.Exists(tempPath))
+                {
+                    File.Delete(tempPath);
+                }
+            }
+
+            return string.Empty;
+        }
+
+        public static bool SerializeUnityObjectToFile(UnityEngine.Object unityObject, string path)
+        {
+            if (unityObject == null)
+            {
+                Debug.LogWarning("SerializeUnityObjectToFile called with null object.");
+                return false;
+            }
+
+            try
+            {
+                InternalEditorUtility.SaveToSerializedFileAndForget(new[] { unityObject }, path, true);
+                return true;
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Failed to serialize '{unityObject.name}' ({unityObject.GetType().Name}) to .asset format: {e.Message}");
+                return false;
+            }
         }
     }
 }

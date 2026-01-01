@@ -2,7 +2,11 @@
     <Style src="project://database/Packages/com.redwyre.devtools/Editor/UnsavedChanges/UnsavedChangesWindow.uss?fileID=7433441132597879392&amp;guid=6901b35446cd9484dab62e4ac7eedda3&amp;type=3#UnsavedChangesWindow"/>
     <ui:VisualElement name="Row" data-source-type="redwyre.DevTools.Editor.UnsavedChanges.DirtyEntry, Redwyre.DevTools.Editor" class="uc-row">
         <ui:VisualElement name="RowInfo" class="uc-row-info">
-            <ui:Image name="Icon" scale-mode="ScaleToFit" binding-path="Icon" class="uc-icon"/>
+            <ui:Image name="Icon" scale-mode="ScaleToFit" class="uc-icon">
+                <Bindings>
+                    <ui:DataBinding property="style.backgroundImage" data-source-path="Icon" binding-mode="ToTarget"/>
+                </Bindings>
+            </ui:Image>
             <ui:VisualElement name="Labels" class="uc-row-labels">
                 <ui:Label name="NameLabel" text="Name" class="uc-name">
                     <Bindings>
@@ -22,9 +26,24 @@
             </Bindings>
         </ui:Label>
         <ui:VisualElement name="Actions" class="uc-row-actions">
-            <ui:Button name="PingButton" text="Ping" tooltip="Ping asset" class="uc-action-button"/>
-            <ui:Button name="SaveButton" text="Save" tooltip="Save changes" class="uc-action-button"/>
-            <ui:Button name="RevertButton" text="Revert" tooltip="Revert changes" class="uc-action-button"/>
+            <redwyre.Core.MVVM.CommandButton text="Ping" name="PingButton" class="uc-action-button">
+                <Bindings>
+                    <ui:DataBinding property="Command" data-source-path="PingCommand" binding-mode="ToTarget"/>
+                    <ui:DataBinding property="CommandParameter" data-source-path="Self" binding-mode="ToTarget"/>
+                </Bindings>
+            </redwyre.Core.MVVM.CommandButton>
+            <redwyre.Core.MVVM.CommandButton text="Save" name="SaveButton" class="uc-action-button">
+                <Bindings>
+                    <ui:DataBinding property="Command" data-source-path="SaveCommand" binding-mode="ToTarget"/>
+                    <ui:DataBinding property="CommandParameter" data-source-path="Self" binding-mode="ToTarget"/>
+                </Bindings>
+            </redwyre.Core.MVVM.CommandButton>
+            <redwyre.Core.MVVM.CommandButton text="Revert" name="RevertButton" class="uc-action-button">
+                <Bindings>
+                    <ui:DataBinding property="Command" data-source-path="RevertCommand" binding-mode="ToTarget"/>
+                    <ui:DataBinding property="CommandParameter" data-source-path="Self" binding-mode="ToTarget"/>
+                </Bindings>
+            </redwyre.Core.MVVM.CommandButton>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

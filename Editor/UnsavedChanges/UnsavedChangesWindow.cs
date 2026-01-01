@@ -1,3 +1,4 @@
+using redwyre.Core.MVVM;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -37,12 +38,6 @@ namespace redwyre.DevTools.Editor.UnsavedChanges
 
         private void OnEnable()
         {
-            viewModel.RefreshRequested += RefreshData;
-            viewModel.SaveAllRequested += HandleSaveAll;
-            viewModel.RevertAllRequested += HandleRevertAll;
-            viewModel.SaveRequested += HandleSaveEntry;
-            viewModel.RevertRequested += HandleRevertEntry;
-            viewModel.PingRequested += HandlePingEntry;
             viewModel.propertyChanged += OnViewModelPropertyChanged;
 
             BuildUI();
@@ -51,12 +46,6 @@ namespace redwyre.DevTools.Editor.UnsavedChanges
 
         private void OnDisable()
         {
-            viewModel.RefreshRequested -= RefreshData;
-            viewModel.SaveAllRequested -= HandleSaveAll;
-            viewModel.RevertAllRequested -= HandleRevertAll;
-            viewModel.SaveRequested -= HandleSaveEntry;
-            viewModel.RevertRequested -= HandleRevertEntry;
-            viewModel.PingRequested -= HandlePingEntry;
             viewModel.propertyChanged -= OnViewModelPropertyChanged;
         }
 
@@ -65,16 +54,7 @@ namespace redwyre.DevTools.Editor.UnsavedChanges
             rootVisualElement.Clear();
 
             var visualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(UxmlPath);
-            if (visualTree != null)
-            {
-                visualTree.CloneTree(rootVisualElement);
-            }
-
-            var styleSheet = AssetDatabase.LoadAssetAtPath<StyleSheet>(UssPath);
-            if (styleSheet != null)
-            {
-                rootVisualElement.styleSheets.Add(styleSheet);
-            }
+            visualTree.CloneTree(rootVisualElement);
 
             rowTemplate = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(RowUxmlPath);
 
@@ -112,23 +92,15 @@ namespace redwyre.DevTools.Editor.UnsavedChanges
                 ListContainer = rootVisualElement.Q<VisualElement>("OtherList")
             };
 
-            if (refreshButton != null)
-            {
-                refreshButton.clicked += () => viewModel.RequestRefresh();
-            }
+            viewModel.RefreshCommand = new RelayCommand(OnRefreshData);
+            viewModel.SaveAllCommand = new RelayCommand(OnSaveAll);
+            viewModel.RevertAllCommand = new RelayCommand(OnRevertAll);
 
-            if (saveAllButton != null)
-            {
-                saveAllButton.clicked += () => viewModel.RequestSaveAll();
-            }
-
-            if (revertAllButton != null)
-            {
-                revertAllButton.clicked += () => viewModel.RequestRevertAll();
-            }
+            refreshButton.clicked += () => viewModel.RefreshCommand.Execute(null);
+            saveAllButton.clicked += () => viewModel.SaveAllCommand.Execute(null);
+            revertAllButton.clicked += () => viewModel.RevertAllCommand.Execute(null);
 
             UpdateStatusBar();
-            UpdateEmptyState();
         }
 
         private void OnViewModelPropertyChanged(object sender, BindablePropertyChangedEventArgs e)
@@ -140,7 +112,6 @@ namespace redwyre.DevTools.Editor.UnsavedChanges
                 e.propertyName == nameof(UnsavedChangesViewModel.OtherCount))
             {
                 UpdateStatusBar();
-                UpdateEmptyState();
                 UpdateHeaders();
             }
             else if (e.propertyName == nameof(UnsavedChangesViewModel.EntriesVersion))
@@ -151,20 +122,11 @@ namespace redwyre.DevTools.Editor.UnsavedChanges
 
         private void RefreshData()
         {
-            viewModel.SetBusy(true);
-            try
-            {
-                var entries = CollectDirtyEntries();
-                viewModel.SetEntries(entries);
-                RebuildSections();
-                UpdateStatusBar();
-                UpdateEmptyState();
-                UpdateHeaders();
-            }
-            finally
-            {
-                viewModel.SetBusy(false);
-            }
+            var entries = CollectDirtyEntries();
+            viewModel.SetEntries(entries);
+            RebuildSections();
+            UpdateStatusBar();
+            UpdateHeaders();
         }
 
         private List<DirtyEntry> CollectDirtyEntries()
@@ -207,16 +169,13 @@ namespace redwyre.DevTools.Editor.UnsavedChanges
 
                 var entry = new DirtyEntry
                 {
-                    Guid = guid,
+                    Guid = new GUID(guid),
                     Path = scene.path,
                     Name = name,
                     Icon = icon,
                     Kind = AssetKind.Scene,
                     IsDirty = true,
-                    IsScene = true,
                     TooltipGuid = guid,
-                    IsPrefab = false,
-                    IsSettings = false
                 };
 
                 var key = guid + scene.path;
@@ -274,16 +233,13 @@ namespace redwyre.DevTools.Editor.UnsavedChanges
                 var kind = DetermineAssetKind(path, obj, mainType);
                 var entry = new DirtyEntry
                 {
-                    Guid = guid,
+                    Guid = new GUID(guid),
                     Path = path,
                     Name = Path.GetFileNameWithoutExtension(path),
                     Icon = AssetDatabase.GetCachedIcon(path) as Texture2D,
                     Kind = kind,
                     IsDirty = true,
-                    IsScene = false,
-                    TooltipGuid = guid,
-                    IsPrefab = kind == AssetKind.Prefab,
-                    IsSettings = kind == AssetKind.Settings
+                    TooltipGuid = guid
                 };
 
                 entries.Add(guid, entry);
@@ -322,7 +278,7 @@ namespace redwyre.DevTools.Editor.UnsavedChanges
 
         private void UpdateHeaderForKind(AssetKind kind, string baseLabel)
         {
-            if (!sections.TryGetValue(kind, out var section) || section.HeaderLabel == null)
+            if (!sections.TryGetValue(kind, out var section))
             {
                 return;
             }
@@ -351,7 +307,7 @@ namespace redwyre.DevTools.Editor.UnsavedChanges
             }
 
             UpdateHeaders();
-            UpdateEmptyState();
+            UpdateStatusBar();
         }
 
         private IReadOnlyList<DirtyEntry> GetEntries(AssetKind kind)
@@ -371,23 +327,6 @@ namespace redwyre.DevTools.Editor.UnsavedChanges
             row.tooltip = entry.TooltipGuid;
             row.dataSource = entry;
 
-            var pingButton = row.Q<Button>("PingButton");
-            pingButton.clicked += () => viewModel.RequestPing(entry);
-
-            var saveButton = row.Q<Button>("SaveButton");
-            saveButton.clicked += () => viewModel.RequestSave(entry);
-
-            var revertButton = row.Q<Button>("RevertButton");
-            revertButton.clicked += () => viewModel.RequestRevert(entry);
-
-            row.RegisterCallback<ClickEvent>(evt =>
-            {
-                if (evt.clickCount == 2)
-                {
-                    viewModel.RequestPing(entry);
-                }
-            });
-
             return row;
         }
 
@@ -395,29 +334,31 @@ namespace redwyre.DevTools.Editor.UnsavedChanges
         {
             if (statusLabel != null)
             {
-            statusLabel.text = $"Scenes: {viewModel.ScenesCount} | Prefabs: {viewModel.PrefabsCount} | Settings: {viewModel.SettingsCount} | Other: {viewModel.OtherCount} | Total: {viewModel.TotalCount}";
-        }
-        }
+                statusLabel.text = $"Scenes: {viewModel.ScenesCount} | Prefabs: {viewModel.PrefabsCount} | Settings: {viewModel.SettingsCount} | Other: {viewModel.OtherCount} | Total: {viewModel.TotalCount}";
+            }
 
-        private void UpdateEmptyState()
-        {
             if (emptyStateLabel != null)
             {
-            emptyStateLabel.style.display = viewModel.TotalCount == 0 ? DisplayStyle.Flex : DisplayStyle.None;
-        }
+                emptyStateLabel.style.display = viewModel.TotalCount == 0 ? DisplayStyle.Flex : DisplayStyle.None;
+            }
         }
 
-        private void HandleSaveAll()
+        private void OnRefreshData(object? parameter)
+        {
+            RefreshData();
+        }
+
+        private void OnSaveAll(object? parameter)
         {
             foreach (var entry in viewModel.AllEntries.ToList())
             {
-                SaveEntry(entry, false);
+                entry.Save();
             }
 
             RefreshData();
         }
 
-        private void HandleRevertAll()
+        private void OnRevertAll(object? parameter)
         {
             if (!EditorUtility.DisplayDialog("Revert All", "Revert all dirty assets? This cannot be undone.", "Revert All", "Cancel"))
             {
@@ -426,95 +367,10 @@ namespace redwyre.DevTools.Editor.UnsavedChanges
 
             foreach (var entry in viewModel.AllEntries.ToList())
             {
-                RevertEntry(entry, false);
+                entry.Revert();
             }
 
             RefreshData();
-        }
-
-        private void HandleSaveEntry(DirtyEntry entry)
-        {
-            SaveEntry(entry, true);
-        }
-
-        private void HandleRevertEntry(DirtyEntry entry)
-        {
-            RevertEntry(entry, true);
-        }
-
-        private void HandlePingEntry(DirtyEntry entry)
-        {
-            var path = AssetDatabase.GUIDToAssetPath(entry.Guid);
-            if (string.IsNullOrEmpty(path))
-            {
-                return;
-            }
-
-            var asset = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(path);
-            if (asset != null)
-            {
-                Selection.activeObject = asset;
-                EditorGUIUtility.PingObject(asset);
-            }
-        }
-
-        private void SaveEntry(DirtyEntry entry, bool refreshAfter)
-        {
-            var path = AssetDatabase.GUIDToAssetPath(entry.Guid);
-            if (string.IsNullOrEmpty(path))
-            {
-                return;
-            }
-
-            if (entry.IsScene)
-            {
-                var scene = SceneManager.GetSceneByPath(path);
-                if (!scene.IsValid())
-                {
-                    scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Additive);
-                }
-
-                if (scene.IsValid())
-                {
-                    EditorSceneManager.SaveScene(scene);
-                }
-            }
-            else
-            {
-                var asset = AssetDatabase.LoadMainAssetAtPath(path);
-                if (asset != null)
-                {
-                    AssetDatabase.SaveAssetIfDirty(asset);
-                }
-            }
-
-            if (refreshAfter)
-            {
-                RefreshData();
-            }
-        }
-
-        private void RevertEntry(DirtyEntry entry, bool refreshAfter)
-        {
-            var path = AssetDatabase.GUIDToAssetPath(entry.Guid);
-            if (string.IsNullOrEmpty(path))
-            {
-                return;
-            }
-
-            if (entry.IsScene)
-            {
-                AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
-            }
-            else
-            {
-                AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
-            }
-
-            if (refreshAfter)
-            {
-                RefreshData();
-            }
         }
 
         private struct SectionElements

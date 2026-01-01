@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Windows.Input;
 using redwyre.Core.MVVM;
 using Unity.Properties;
 
@@ -7,7 +8,7 @@ namespace redwyre.DevTools.Editor.UnsavedChanges
 {
     public class UnsavedChangesViewModel : ObservableObject
     {
-        private readonly Dictionary<AssetKind, List<DirtyEntry>> entriesByKind = new()
+        readonly Dictionary<AssetKind, List<DirtyEntry>> entriesByKind = new()
         {
             { AssetKind.Scene, new() },
             { AssetKind.Prefab, new() },
@@ -15,16 +16,14 @@ namespace redwyre.DevTools.Editor.UnsavedChanges
             { AssetKind.Other, new() }
         };
 
-        private readonly List<DirtyEntry> allEntries = new();
-        private int entriesVersion;
-        private bool isBusy;
+        readonly List<DirtyEntry> allEntries = new();
+        int entriesVersion;
 
-        public event Action? RefreshRequested;
-        public event Action? SaveAllRequested;
-        public event Action? RevertAllRequested;
-        public event Action<DirtyEntry>? SaveRequested;
-        public event Action<DirtyEntry>? RevertRequested;
-        public event Action<DirtyEntry>? PingRequested;
+        public ICommand? RefreshCommand { get; set; }
+
+        public ICommand? SaveAllCommand { get; set; }
+
+        public ICommand? RevertAllCommand { get; set; }
 
         public IReadOnlyList<DirtyEntry> AllEntries => allEntries;
         public IReadOnlyList<DirtyEntry> Scenes => entriesByKind[AssetKind.Scene];
@@ -32,26 +31,23 @@ namespace redwyre.DevTools.Editor.UnsavedChanges
         public IReadOnlyList<DirtyEntry> Settings => entriesByKind[AssetKind.Settings];
         public IReadOnlyList<DirtyEntry> Other => entriesByKind[AssetKind.Other];
 
+        [CreateProperty]
         public int TotalCount => allEntries.Count;
-        public int ScenesCount => Scenes.Count;
-        public int PrefabsCount => Prefabs.Count;
-        public int SettingsCount => Settings.Count;
-        public int OtherCount => Other.Count;
-        public int EntriesVersion => entriesVersion;
 
         [CreateProperty]
-        public bool IsBusy
-        {
-            get => isBusy;
-            private set => SetProperty(ref isBusy, value);
-        }
+        public int ScenesCount => Scenes.Count;
 
-        public void RequestRefresh() => RefreshRequested?.Invoke();
-        public void RequestSaveAll() => SaveAllRequested?.Invoke();
-        public void RequestRevertAll() => RevertAllRequested?.Invoke();
-        public void RequestSave(DirtyEntry entry) => SaveRequested?.Invoke(entry);
-        public void RequestRevert(DirtyEntry entry) => RevertRequested?.Invoke(entry);
-        public void RequestPing(DirtyEntry entry) => PingRequested?.Invoke(entry);
+        [CreateProperty]
+        public int PrefabsCount => Prefabs.Count;
+
+        [CreateProperty]
+        public int SettingsCount => Settings.Count;
+
+        [CreateProperty]
+        public int OtherCount => Other.Count;
+
+        [CreateProperty]
+        public int EntriesVersion => entriesVersion;
 
         public void SetEntries(IEnumerable<DirtyEntry> entries)
         {
@@ -75,11 +71,6 @@ namespace redwyre.DevTools.Editor.UnsavedChanges
             Notify(nameof(PrefabsCount));
             Notify(nameof(SettingsCount));
             Notify(nameof(OtherCount));
-        }
-
-        public void SetBusy(bool busy)
-        {
-            IsBusy = busy;
         }
     }
 }
