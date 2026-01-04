@@ -1,109 +1,96 @@
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
-public abstract class ProcessTerminalHostBase : IHost
+namespace redwyre.DevTools.Editor.Terminal
 {
-    readonly StringBuilder buffer = new();
-    readonly object syncRoot = new();
-    readonly string workingDirectory;
-    bool publishScheduled;
-
-    public event Action<string>? OutputChanged;
-
-    public string WorkingDirectory => workingDirectory;
-    public abstract string ShellDisplayName { get; }
-
-    protected ProcessTerminalHostBase()
+    public abstract class ProcessTerminalHostBase : IConsole, IDisposable
     {
-        workingDirectory = ResolveWorkingDirectory();
-    }
+        readonly string workingDirectory;
 
-    public void Write(string text)
-    {
-        lock (syncRoot)
+        public string WorkingDirectory => workingDirectory;
+
+        public abstract string DisplayName { get; }
+
+        Process? process = null;
+
+        public bool SupportsVT100 => false;
+
+        public bool HasTerminated => process?.HasExited ?? true;
+
+        public StreamReader ConsoleOutputStream { get; private set; }
+
+        public StreamWriter ConsoleInputStream { get; private set; }
+
+        MemoryStream consoleOutputMerged = new MemoryStream(1024);
+        MemoryStream consoleInputDummy = new MemoryStream();
+
+        StreamWriter consoleOutputWriter;
+
+        protected ProcessTerminalHostBase(string command)
         {
-            buffer.Append(text);
+            workingDirectory = ResolveWorkingDirectory();
+
+            consoleOutputWriter = new StreamWriter(consoleOutputMerged) { AutoFlush = true };
+
+            ConsoleOutputStream = new StreamReader(consoleOutputMerged);
+            ConsoleInputStream = new StreamWriter(consoleInputDummy);
+
+            RunProcess(command);
         }
 
-        SchedulePublish();
-    }
-
-    public void WriteLine(string line)
-    {
-        lock (syncRoot)
+        public void Dispose()
         {
-            buffer.AppendLine(line);
+            process?.Dispose();
+            consoleOutputWriter.Dispose();
+            ConsoleOutputStream.Dispose();
+            ConsoleInputStream.Dispose();
         }
 
-        SchedulePublish();
-    }
-
-    public void Clear()
-    {
-        lock (syncRoot)
+        private static string ResolveWorkingDirectory()
         {
-            buffer.Clear();
-        }
-
-        SchedulePublish();
-    }
-
-    public void ExecuteCommand(string command)
-    {
-        if (string.IsNullOrWhiteSpace(command))
-        {
-            return;
-        }
-
-        WriteLine($"> {command}");
-        Task.Run(() => RunProcess(command));
-    }
-
-    protected abstract ProcessStartInfo CreateStartInfo(string command);
-
-    protected ProcessStartInfo Configure(ProcessStartInfo startInfo)
-    {
-        startInfo.WorkingDirectory = workingDirectory;
-        startInfo.CreateNoWindow = true;
-        startInfo.UseShellExecute = false;
-        startInfo.RedirectStandardInput = false;
-        startInfo.RedirectStandardOutput = true;
-        startInfo.RedirectStandardError = true;
-        return startInfo;
-    }
-
-    private static string ResolveWorkingDirectory()
-    {
-        if (!string.IsNullOrEmpty(Application.dataPath))
-        {
-            var directoryInfo = Directory.GetParent(Application.dataPath);
-            if (directoryInfo != null)
+            if (!string.IsNullOrEmpty(Application.dataPath))
             {
-                return directoryInfo.FullName;
+                var directoryInfo = Directory.GetParent(Application.dataPath);
+                if (directoryInfo != null)
+                {
+                    return directoryInfo.FullName;
+                }
             }
+
+            return Directory.GetCurrentDirectory();
         }
 
-        return Directory.GetCurrentDirectory();
-    }
-
-    private void RunProcess(string command)
-    {
-        try
+        private void RunProcess(string command)
         {
-            var startInfo = CreateStartInfo(command);
-
-            using (var process = new Process { StartInfo = startInfo, EnableRaisingEvents = true })
+            if (process != null)
             {
+                Debug.LogWarning("Process is already running.");
+                return;
+            }
+
+            try
+            {
+                var startInfo = new ProcessStartInfo(command)
+                {
+                    WorkingDirectory = workingDirectory,
+                    CreateNoWindow = true,
+                    UseShellExecute = false,
+                    RedirectStandardInput = true,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true
+                };
+
+                process = new Process { StartInfo = startInfo, EnableRaisingEvents = true };
+
                 process.OutputDataReceived += (_, args) =>
                 {
                     if (!string.IsNullOrEmpty(args.Data))
                     {
-                        WriteLine(args.Data);
+                        consoleOutputWriter.WriteLine(args.Data);
                     }
                 };
 
@@ -111,51 +98,21 @@ public abstract class ProcessTerminalHostBase : IHost
                 {
                     if (!string.IsNullOrEmpty(args.Data))
                     {
-                        WriteLine(args.Data);
+                        consoleOutputWriter.WriteLine(args.Data);
                     }
                 };
 
                 process.Start();
+
                 process.BeginOutputReadLine();
                 process.BeginErrorReadLine();
-                process.WaitForExit();
 
-                WriteLine($"(exit code {process.ExitCode})");
+                this.ConsoleInputStream = process.StandardInput;
             }
-        }
-        catch (Exception ex)
-        {
-            WriteLine($"Error: {ex.Message}");
-        }
-    }
-
-    private void SchedulePublish()
-    {
-        bool shouldSchedule;
-        lock (syncRoot)
-        {
-            shouldSchedule = !publishScheduled;
-            if (shouldSchedule)
+            catch (Exception ex)
             {
-                publishScheduled = true;
+                Debug.LogWarning($"Error: {ex.Message}");
             }
         }
-
-        if (shouldSchedule)
-        {
-            EditorApplication.delayCall += Publish;
-        }
-    }
-
-    private void Publish()
-    {
-        string snapshot;
-        lock (syncRoot)
-        {
-            snapshot = buffer.ToString();
-            publishScheduled = false;
-        }
-
-        OutputChanged?.Invoke(snapshot);
     }
 }

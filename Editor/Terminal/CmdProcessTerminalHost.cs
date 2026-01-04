@@ -1,11 +1,12 @@
-using System.Diagnostics;
-
-public sealed class CmdProcessTerminalHost : ProcessTerminalHostBase
+namespace redwyre.DevTools.Editor.Terminal
 {
-    public override string ShellDisplayName => "cmd.exe";
-
-    protected override ProcessStartInfo CreateStartInfo(string command)
+    public sealed class CmdProcessTerminalHost : ProcessTerminalHostBase
     {
-        return Configure(new ProcessStartInfo("cmd.exe", "/c " + command));
+        public override string DisplayName => "cmd";
+
+        public CmdProcessTerminalHost()
+            : base("cmd.exe")
+        {
+        }
     }
 }

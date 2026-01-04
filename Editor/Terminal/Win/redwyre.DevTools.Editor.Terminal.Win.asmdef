@@ -1,0 +1,18 @@
+{
+    "name": "redwyre.DevTools.Editor.Terminal.Win",
+    "rootNamespace": "",
+    "references": [
+        "GUID:c073c66fddbc0dd468ddd53d98870b80"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

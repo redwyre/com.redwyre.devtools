@@ -1,12 +1,12 @@
-using System.Diagnostics;
-
-public sealed class BashProcessTerminalHost : ProcessTerminalHostBase
+namespace redwyre.DevTools.Editor.Terminal
 {
-    public override string ShellDisplayName => "/bin/bash";
-
-    protected override ProcessStartInfo CreateStartInfo(string command)
+    public sealed class BashProcessTerminalHost : ProcessTerminalHostBase
     {
-        var escapedCommand = command.Replace("\"", "\\\"");
-        return Configure(new ProcessStartInfo("/bin/bash", $"-lc \"{escapedCommand}\""));
+        public override string DisplayName => "bash";
+
+        public BashProcessTerminalHost()
+            : base("/bin/bash")
+        {
+        }
     }
 }
