@@ -1,6 +1,8 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
@@ -16,6 +18,7 @@ namespace redwyre.DevTools.Editor.Terminal
         public abstract string DisplayName { get; }
 
         Process? process = null;
+        CancellationTokenSource cancellationTokenSource = new();
 
         public bool SupportsVT100 => false;
 
@@ -44,6 +47,7 @@ namespace redwyre.DevTools.Editor.Terminal
 
         public void Dispose()
         {
+            cancellationTokenSource.Cancel();
             process?.Dispose();
             consoleOutputWriter.Dispose();
             ConsoleOutputStream.Dispose();
@@ -85,33 +89,73 @@ namespace redwyre.DevTools.Editor.Terminal
                 };
 
                 process = new Process { StartInfo = startInfo, EnableRaisingEvents = true };
-
-                process.OutputDataReceived += (_, args) =>
-                {
-                    if (!string.IsNullOrEmpty(args.Data))
-                    {
-                        consoleOutputWriter.WriteLine(args.Data);
-                    }
-                };
-
-                process.ErrorDataReceived += (_, args) =>
-                {
-                    if (!string.IsNullOrEmpty(args.Data))
-                    {
-                        consoleOutputWriter.WriteLine(args.Data);
-                    }
-                };
-
                 process.Start();
-
-                process.BeginOutputReadLine();
-                process.BeginErrorReadLine();
+                process.Exited += (sender, args) => cancellationTokenSource.Cancel();
+                process.EnableRaisingEvents = true;
 
                 this.ConsoleInputStream = process.StandardInput;
+
+                _ = Function(cancellationTokenSource.Token);
             }
             catch (Exception ex)
             {
                 Debug.LogWarning($"Error: {ex.Message}");
+            }
+        }
+
+        private async Task Function(CancellationToken token)
+        {
+            var stdout = process!.StandardOutput;
+            var stderr = process.StandardError;
+
+            var stdOutBuffer = new char[256];
+            var stdErrBuffer = new char[256];
+
+            var outTask = stdout.ReadAsync(stdOutBuffer).AsTask();
+            var errTask = stderr.ReadAsync(stdErrBuffer).AsTask();
+
+            while (!token.IsCancellationRequested)
+            {
+                var completedTask = await Task.WhenAny(outTask, errTask);
+                if (!completedTask.IsCompletedSuccessfully)
+                {
+                    break;
+                }
+
+                if (completedTask == outTask)
+                {
+                    var read = outTask.Result;
+                    if (read > 0)
+                    {
+                        consoleOutputWriter.Write(stdOutBuffer, 0, read);
+                    }
+                    outTask = stdout.ReadAsync(stdOutBuffer, token).AsTask();
+                }
+                else if (completedTask == errTask)
+                {
+                    var read = errTask.Result;
+                    if (read > 0)
+                    {
+                        consoleOutputWriter.Write(stdErrBuffer, 0, read);
+                    }
+                    errTask = stderr.ReadAsync(stdErrBuffer, token).AsTask();
+                }
+            }
+
+            try
+            {
+                await outTask;
+            }
+            catch
+            {
+            }
+
+            try
+            {
+                await errTask;
+            }
+            catch
+            {
             }
         }
     }

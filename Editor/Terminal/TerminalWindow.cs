@@ -19,13 +19,9 @@ namespace redwyre.DevTools.Editor.Terminal
 
         public const int MaxOutputLength = 10000;
 
-        readonly List<string> history = new List<string>();
-        int historyIndex = -1;
-
         IConsole? host;
         TextField? output;
         TextField? input;
-        Button? submit;
 
         [MenuItem("Window/Tools/Terminal", priority = 10000)]
         public static void ShowTerminalWindow()
@@ -44,7 +40,6 @@ namespace redwyre.DevTools.Editor.Terminal
         {
             output?.SetEnabled(false);
             input?.SetEnabled(false);
-            submit?.SetEnabled(false);
 
             if (host is IDisposable disposable)
             {
@@ -65,7 +60,6 @@ namespace redwyre.DevTools.Editor.Terminal
             var help = root.Q<Button>("Help");
             input = root.Q<TextField>("Input");
             output = root.Q<TextField>("Output");
-            submit = root.Q<Button>("Submit");
 
             //clear.clicked += () => host?.Clear();
 
@@ -83,41 +77,29 @@ namespace redwyre.DevTools.Editor.Terminal
                 evt.StopImmediatePropagation();
             }, TrickleDown.TrickleDown);
 
+            //output.RegisterCallback<KeyDownEvent>(evt =>
+            //{
+            //    if (evt.character != 0)
+            //    {
+            //        host?.ConsoleInputStream.Write(evt.character);
+            //    }
+            //}, TrickleDown.TrickleDown);
+
             input.RegisterCallback<KeyDownEvent>(evt =>
             {
                 switch (evt.keyCode)
                 {
-                    case KeyCode.UpArrow:
-                        NavigateHistory(-1, input);
-                        evt.StopImmediatePropagation();
-                        break;
-
-                    case KeyCode.DownArrow:
-                        NavigateHistory(+1, input);
-                        evt.StopImmediatePropagation();
-                        break;
-
-                    case KeyCode.Return:
-                    case KeyCode.KeypadEnter:
-                        SubmitCommand();
-                        root.focusController.IgnoreEvent(evt);
-                        evt.StopImmediatePropagation();
-                        break;
+                case KeyCode.Return:
+                case KeyCode.KeypadEnter:
+                    SubmitCommand();
+                    root.focusController.IgnoreEvent(evt);
+                    evt.StopImmediatePropagation();
+                    break;
                 }
             }, TrickleDown.TrickleDown);
 
-            submit.clicked += () =>
-            {
-                SubmitCommand();
-            };
-
             var processHost = new CmdProcessTerminalHost();
             host = processHost;
-
-            //host.WriteLine("Console Terminal ready.");
-            //host.WriteLine($"Shell: {processHost.DisplayName}");
-            //host.WriteLine($"Working directory: {processHost.WorkingDirectory}");
-            //host.WriteLine("Type any console command and press Enter.");
         }
 
         private void SubmitCommand()
@@ -126,39 +108,10 @@ namespace redwyre.DevTools.Editor.Terminal
             if (!Nullable.IsNullOrEmpty(cmd))
             {
                 host?.ConsoleInputStream.WriteLine(cmd);
-                history.Add(cmd);
-                historyIndex = history.Count - 1;
             }
 
             input.value = string.Empty;
             input.Focus();
-        }
-
-        private void NavigateHistory(int direction, TextField textField)
-        {
-            if (history.Count == 0)
-            {
-                return;
-            }
-
-            historyIndex += direction;
-            if (historyIndex < 0)
-            {
-                historyIndex = 0;
-            }
-            else if (historyIndex >= history.Count)
-            {
-                historyIndex = history.Count - 1;
-            }
-
-            if (historyIndex >= 0 && historyIndex < history.Count)
-            {
-                textField.value = history[historyIndex];
-            }
-            else
-            {
-                textField.value = string.Empty;
-            }
         }
 
         public void Update()
@@ -190,8 +143,7 @@ namespace redwyre.DevTools.Editor.Terminal
                 else if (str.Length > MaxOutputLength)
                 {
                     // new string by itself exceeds limit, take last part
-
-                    var searchIndex = str.Length - MaxOutputLength;
+                    var searchIndex = str.Length - MaxOutputLength + Environment.NewLine.Length;
                     var startIndex = str.IndexOf(Environment.NewLine, searchIndex);
                     startIndex = startIndex < 0 ? searchIndex : startIndex;
 
@@ -203,7 +155,7 @@ namespace redwyre.DevTools.Editor.Terminal
                     var old = output.value;
                     var limit = MaxOutputLength - str.Length;
 
-                    var searchIndex = old.Length - limit;
+                    var searchIndex = old.Length - limit + Environment.NewLine.Length;
                     var startIndex = old.IndexOf(Environment.NewLine, searchIndex);
                     startIndex = startIndex < 0 ? searchIndex : startIndex;
 
@@ -214,16 +166,13 @@ namespace redwyre.DevTools.Editor.Terminal
             {
                 char[] buffer = new char[256];
                 var length = host.ConsoleOutputStream.Read(buffer);
-                //var span = new Span<char>(buffer, 0, length);
 
                 var str = new string(buffer, 0, length);
                 output.value += str;
             }
 
-
             var end = output.value.Length - 1;
             output.selectIndex = output.cursorIndex = end;
-            output.SelectRange(end, end);
         }
     }
 }

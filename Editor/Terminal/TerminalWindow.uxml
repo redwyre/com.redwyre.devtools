@@ -4,9 +4,8 @@
         <uie:ToolbarButton text="Clear" name="Clear"/>
         <uie:ToolbarButton text="Help" name="Help"/>
     </uie:Toolbar>
-    <ui:TextField name="Output" multiline="true" vertical-scroller-visibility="AlwaysVisible" select-all-on-focus="false" select-all-on-mouse-up="false" class="terminal-font" style="flex-grow: 1; flex-shrink: 1;"/>
+    <ui:TextField name="Output" multiline="true" vertical-scroller-visibility="AlwaysVisible" select-all-on-focus="false" select-all-on-mouse-up="false" readonly="true" label="" class="terminal-font" style="flex-grow: 1; flex-shrink: 1;"/>
     <ui:VisualElement style="flex-direction: row; flex-grow: 0; flex-shrink: 0;">
         <ui:TextField name="Input" select-all-on-focus="false" select-all-on-mouse-up="false" select-line-by-triple-click="false" class="terminal-font" style="flex-grow: 1;"/>
-        <ui:Button text="Enter" name="Submit"/>
     </ui:VisualElement>
 </ui:UXML>
