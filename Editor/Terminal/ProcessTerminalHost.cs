@@ -136,7 +136,9 @@ namespace redwyre.DevTools.Editor.Terminal
                     var read = errTask.Result;
                     if (read > 0)
                     {
+                        consoleOutputWriter.Write("<color=red>");
                         consoleOutputWriter.Write(stdErrBuffer, 0, read);
+                        consoleOutputWriter.Write("</color>");
                     }
                     errTask = stderr.ReadAsync(stdErrBuffer, token).AsTask();
                 }

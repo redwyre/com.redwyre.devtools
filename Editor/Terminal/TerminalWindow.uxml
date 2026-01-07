@@ -1,10 +1,12 @@
-<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xmlns:term="redwyre.DevTools.Editor.Terminal" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
     <Style src="project://database/Packages/com.redwyre.devtools/Editor/Terminal/TerminalWindow.uss?fileID=7433441132597879392&amp;guid=3aa3f2100c0c9034da59f323c7bd04d0&amp;type=3#TerminalWindow"/>
     <uie:Toolbar>
-        <uie:ToolbarButton text="Clear" name="Clear"/>
-        <uie:ToolbarButton text="Help" name="Help"/>
+        <uie:ToolbarButton text="Clear" name="Clear" focusable="false"/>
+        <uie:ToolbarButton text="Help" name="Help" focusable="false"/>
     </uie:Toolbar>
-    <ui:TextField name="Output" multiline="true" vertical-scroller-visibility="AlwaysVisible" select-all-on-focus="false" select-all-on-mouse-up="false" readonly="true" label="" class="terminal-font" style="flex-grow: 1; flex-shrink: 1;"/>
+    <ui:ScrollView mode="VerticalAndHorizontal" name="OutputScrollView" tabindex="-1" style="flex-grow: 1;">
+        <term:ConsoleText name="Output" multiline="true" vertical-scroller-visibility="AlwaysVisible" select-all-on-focus="false" select-all-on-mouse-up="false" readonly="true" label="" selectable="true" focusable="true" tabindex="1" class="terminal-font"/>
+    </ui:ScrollView>
     <ui:VisualElement style="flex-direction: row; flex-grow: 0; flex-shrink: 0;">
         <ui:TextField name="Input" select-all-on-focus="false" select-all-on-mouse-up="false" select-line-by-triple-click="false" class="terminal-font" style="flex-grow: 1;"/>
     </ui:VisualElement>
