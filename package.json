@@ -2,11 +2,8 @@
   "name": "com.redwyre.devtools",
   "version": "1.0.0",
   "displayName": "redwyre Dev Tools",
-  "description": "A window with some tools for developers",
+  "description": "A some tools for developers. Clear library, burst cache, some toolbar buttons.",
   "unity": "2022.2",
-  "documentationUrl": "https://example.com/",
-  "changelogUrl": "https://example.com/changelog.html",
-  "licensesUrl": "https://example.com/licensing.html",
   "dependencies": {
     "com.unity.editorcoroutines": "1.0.0"
   },

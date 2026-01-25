@@ -27,7 +27,7 @@ namespace redwyre.DevTools.Toolbar
             if (activeProfile != newActiveProfile)
             {
                 activeProfile = newActiveProfile;
-                Debug.Log($"Build Profile changed to: {(newActiveProfile != null ? newActiveProfile.name : "None")}");
+                //Debug.Log($"Build Profile changed to: {(newActiveProfile != null ? newActiveProfile.name : "None")}");
                 MainToolbar.Refresh(MenuPath_BuildActiveBuildProfile);
                 MainToolbar.Refresh(MenuPath_SelectBuildProfile);
             }
@@ -49,7 +49,11 @@ namespace redwyre.DevTools.Toolbar
                 content = new MainToolbarContent(activeProfile.name, icon, "Build active BuildProfile");
             }
 
-            return new MainToolbarButton(content, OnBuildActiveBuildProfileClicked) { populateContextMenu = PopulateBuildProfileContextMenu };
+            return new MainToolbarButton(content, OnBuildActiveBuildProfileClicked)
+            {
+                populateContextMenu = PopulateBuildProfileContextMenu,
+                enabled = !Application.isPlaying,
+            };
         }
 
         private static void PopulateBuildProfileContextMenu(DropdownMenu menu)
