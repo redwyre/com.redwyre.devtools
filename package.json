@@ -1,6 +1,6 @@
 {
   "name": "com.redwyre.devtools",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "displayName": "redwyre Dev Tools",
   "description": "A some tools for developers. Clear library, burst cache, some toolbar buttons.",
   "unity": "2022.2",
