@@ -5,7 +5,8 @@
   "description": "A some tools for developers. Clear library, burst cache, some toolbar buttons.",
   "unity": "2022.2",
   "dependencies": {
-    "com.unity.editorcoroutines": "1.0.0"
+    "com.unity.editorcoroutines": "1.0.0",
+    "com.redwyre.core": "1.0.0"
   },
   "keywords": [
     "build"
