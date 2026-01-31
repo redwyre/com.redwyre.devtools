@@ -12,48 +12,51 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public partial class DevTools : EditorWindow
+namespace redwyre.devtools.Editor
 {
-    public Button CloseError { get; private set; }
-
-    public Label ErrorMessage { get; private set; }
-
-    public Button ForceRecompile { get; private set; }
-
-    public Button ReloadDomain { get; private set; }
-
-    public Button CalculateBurstCacheSize { get; private set; }
-
-    public Label labelBurstCacheSize { get; private set; }
-
-    public Button ClearBurstCache { get; private set; }
-
-    public Button RestartBurst { get; private set; }
-
-    public Button NukeScripts { get; private set; }
-
-    public Button NukeLibrary { get; private set; }
-
-    public VisualElement ErrorMessageContainer { get; private set; }
-
-    public void CreateGUI()
+    public partial class DevTools : EditorWindow
     {
-        VisualTreeAsset asset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Packages/com.redwyre.devtools/Editor/DevTools.uxml");
-        VisualElement ui = asset.CloneTree();
-        rootVisualElement.Add(ui);
-        CloseError = rootVisualElement?.Q<Button>("CloseError");
-        ErrorMessage = rootVisualElement?.Q<Label>("ErrorMessage");
-        ForceRecompile = rootVisualElement?.Q<Button>("ForceRecompile");
-        ReloadDomain = rootVisualElement?.Q<Button>("ReloadDomain");
-        CalculateBurstCacheSize = rootVisualElement?.Q<Button>("CalculateBurstCacheSize");
-        labelBurstCacheSize = rootVisualElement?.Q<Label>("labelBurstCacheSize");
-        ClearBurstCache = rootVisualElement?.Q<Button>("ClearBurstCache");
-        RestartBurst = rootVisualElement?.Q<Button>("RestartBurst");
-        NukeScripts = rootVisualElement?.Q<Button>("NukeScripts");
-        NukeLibrary = rootVisualElement?.Q<Button>("NukeLibrary");
-        ErrorMessageContainer = rootVisualElement?.Q<VisualElement>("ErrorMessageContainer");
-        OnCreateGUI();
-    }
+        public Button CloseError { get; private set; }
 
-    partial void OnCreateGUI();
+        public Label ErrorMessage { get; private set; }
+
+        public Button ForceRecompile { get; private set; }
+
+        public Button ReloadDomain { get; private set; }
+
+        public Button CalculateBurstCacheSize { get; private set; }
+
+        public Label labelBurstCacheSize { get; private set; }
+
+        public Button ClearBurstCache { get; private set; }
+
+        public Button RestartBurst { get; private set; }
+
+        public Button NukeScripts { get; private set; }
+
+        public Button NukeLibrary { get; private set; }
+
+        public VisualElement ErrorMessageContainer { get; private set; }
+
+        public void CreateGUI()
+        {
+            VisualTreeAsset asset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Packages/com.redwyre.devtools/Editor/DevTools.uxml");
+            VisualElement ui = asset.CloneTree();
+            rootVisualElement.Add(ui);
+            CloseError = rootVisualElement?.Q<Button>("CloseError");
+            ErrorMessage = rootVisualElement?.Q<Label>("ErrorMessage");
+            ForceRecompile = rootVisualElement?.Q<Button>("ForceRecompile");
+            ReloadDomain = rootVisualElement?.Q<Button>("ReloadDomain");
+            CalculateBurstCacheSize = rootVisualElement?.Q<Button>("CalculateBurstCacheSize");
+            labelBurstCacheSize = rootVisualElement?.Q<Label>("labelBurstCacheSize");
+            ClearBurstCache = rootVisualElement?.Q<Button>("ClearBurstCache");
+            RestartBurst = rootVisualElement?.Q<Button>("RestartBurst");
+            NukeScripts = rootVisualElement?.Q<Button>("NukeScripts");
+            NukeLibrary = rootVisualElement?.Q<Button>("NukeLibrary");
+            ErrorMessageContainer = rootVisualElement?.Q<VisualElement>("ErrorMessageContainer");
+            OnCreateGUI();
+        }
+
+        partial void OnCreateGUI();
+    }
 }
