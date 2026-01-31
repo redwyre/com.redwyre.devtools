@@ -52,7 +52,7 @@ namespace redwyre.DevTools.Toolbar
             return new MainToolbarButton(content, OnBuildActiveBuildProfileClicked)
             {
                 populateContextMenu = PopulateBuildProfileContextMenu,
-                enabled = !Application.isPlaying,
+                enabled = !Application.isPlaying && activeProfile != null,
             };
         }
 
@@ -77,6 +77,12 @@ namespace redwyre.DevTools.Toolbar
 
         private static void OnBuildActiveBuildProfileClicked()
         {
+            if (activeProfile == null)
+            {
+                Debug.LogWarning("No active BuildProfile selected.");
+                return;
+            }
+
             var options = new BuildPlayerWithProfileOptions
             {
                 buildProfile = activeProfile,
